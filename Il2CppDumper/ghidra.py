@@ -39,17 +39,15 @@ if "ScriptMethod" in data and "ScriptMethod" in processFields:
 		monitor.incrementProgress(1)
 
 if "ScriptString" in data and "ScriptString" in processFields:
-	index = 1
 	scriptStrings = data["ScriptString"]
 	monitor.initialize(len(scriptStrings))
 	monitor.setMessage("Strings")
-	for scriptString in scriptStrings:
+	for index, scriptString in enumerate(scriptStrings, start=1):
 		addr = get_addr(scriptString["Address"])
 		value = scriptString["Value"].encode("utf-8")
-		name = "StringLiteral_" + str(index)
+		name = f"StringLiteral_{str(index)}"
 		createLabel(addr, name, True, USER_DEFINED)
 		setEOLComment(addr, value)
-		index += 1
 		monitor.incrementProgress(1)
 
 if "ScriptMetadata" in data and "ScriptMetadata" in processFields:

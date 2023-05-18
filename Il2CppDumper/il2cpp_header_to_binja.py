@@ -8,8 +8,6 @@ builtin = ["void", "intptr_t", "uint32_t", "uint16_t", "int32_t", "uint8_t", "bo
            "struct", "Il2CppMethodPointer"]
 structs = []
 notfound = []
-header = ""
-
 for line in data.splitlines():
     if line.startswith("struct") or line.startswith("union"):
         struct = line.split()[1]
@@ -28,11 +26,10 @@ for line in data.splitlines():
             continue
         if struct not in structs and struct not in notfound:
             notfound.append(struct)
-for struct in notfound:
-    header += f"struct {struct};" + "\n"
+header = "".join(f"struct {struct};" + "\n" for struct in notfound)
 to_replace = re.findall("struct (.*) {\n};", data)
 for item in to_replace:
-    data = data.replace("struct "+item+" {\n};", "")
+    data = data.replace(f"struct {item}" + " {\n};", "")
     data = data.replace("\t"+item.split()[0]+" ", "\tvoid *")
     data = data.replace("\t struct "+item.split()[0]+" ", "\t void *")
     data = re.sub(r": (\w+) {", r"{\n\t\1 super;", data)
