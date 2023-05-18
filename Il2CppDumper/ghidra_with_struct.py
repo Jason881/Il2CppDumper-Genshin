@@ -32,7 +32,7 @@ def set_type(addr, type):
 	dataTypes = getDataTypes(newType)
 	addrType = None
 	if len(dataTypes) == 0:
-		if newType == newType[:-2] + " *":
+		if newType == f"{newType[:-2]} *":
 			baseType = newType[:-2]
 			dataTypes = getDataTypes(baseType)
 			if len(dataTypes) == 1:
@@ -40,17 +40,17 @@ def set_type(addr, type):
 				pointerType = dtm.getPointer(dataTypes[0])
 				addrType = dtm.addDataType(pointerType, None)
 	elif len(dataTypes) > 1:
-		print("Conflicting data types found for type " + type + "(parsed as '" + newType + "')")
+		print(f"Conflicting data types found for type {type}(parsed as '{newType}')")
 		return
 	else:
 		addrType = dataTypes[0]
 	if addrType is None:
-		print("Could not identify type " + type + "(parsed as '" + newType + "')")
+		print(f"Could not identify type {type}(parsed as '{newType}')")
 	else:
-	    try:
-	        createData(addr, addrType)
-	    except ghidra.program.model.util.CodeUnitInsertionException:
-	        print("Warning: unable to set type (CodeUnitInsertionException)")
+		try:
+		    createData(addr, addrType)
+		except ghidra.program.model.util.CodeUnitInsertionException:
+		    print("Warning: unable to set type (CodeUnitInsertionException)")
 	    
 
 def make_function(start):

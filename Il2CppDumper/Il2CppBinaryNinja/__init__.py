@@ -19,18 +19,15 @@ class Il2CppProcessTask(BackgroundTaskThread):
         with open(self.header_path) as f:
             result = self.bv.parse_types_from_string(f.read())
         length = len(result.types)
-        i = 0
-        for name in result.types:
-            i += 1
+        for i, name in enumerate(result.types, start=1):
             if i % 100 == 0:
                 percent = i / length * 100
                 self.progress = f"Il2Cpp types: {percent:.2f}%"
-            if self.bv.get_type_by_name(name):
-                continue
-            self.bv.define_user_type(name, result.types[name])
+            if not self.bv.get_type_by_name(name):
+                self.bv.define_user_type(name, result.types[name])
     
     def process_methods(self, data: dict):
-        self.progress = f"Il2Cpp methods (2/3)"
+        self.progress = "Il2Cpp methods (2/3)"
         scriptMethods = data["ScriptMethod"]
         length = len(scriptMethods)
         i = 0
@@ -44,12 +41,12 @@ class Il2CppProcessTask(BackgroundTaskThread):
                 self.progress = f"Il2Cpp methods: {percent:.2f}%"
             addr = get_addr(self.bv, scriptMethod["Address"])
             name = scriptMethod["Name"].replace("$", "_").replace(".", "_")
-            signature = scriptMethod["Signature"]
             func = self.bv.get_function_at(addr)
             if func != None:
                 if func.name == name:
                     continue
                 if self.has_types:
+                    signature = scriptMethod["Signature"]
                     func.function_type = signature
                 else:
                     func.name = scriptMethod["Name"]
@@ -57,9 +54,7 @@ class Il2CppProcessTask(BackgroundTaskThread):
     def process_strings(self, data: dict):
         self.progress = "Il2Cpp strings (3/3)"
         scriptStrings = data["ScriptString"]
-        i = 0
-        for scriptString in scriptStrings:
-            i += 1
+        for i, scriptString in enumerate(scriptStrings, start=1):
             if self.cancelled:
                 self.progress = "Il2Cpp cancelled, aborting"
                 return
